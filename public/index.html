@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Cisco APIC Controller</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        }
+    </style>
+    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.css" rel="stylesheet">
+    <!-- <link href="css/styles.css" rel="stylesheet"> -->
+    <script src="http://use.edgefonts.net/andika.js"></script>
+    <script src="http://use.edgefonts.net/arvo.js"></script>
+</head>
+
+<body>
+
+<div class="header"></div>
+
+<div class="container">
+     <div class="row">
+       <div class="span8">
+        <table id="content" class="table table-hover">
+          <thead>
+	    <tr>
+	      <th>Student Id</th>
+	    </tr>
+	  </thead>
+        </table>
+        </div>
+        <div class="span4">
+          <p><img id="picture" width="180" src="img/appletv.jpeg"/></p>
+        </div>
+      </div>
+
+    <footer class="footer">
+        <p> For more info contact helper@helping.org </p>
+    </footer>
+
+</div>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
+<script>
+// Backbone Model Setup
+window.User = Backbone.Model.extend({
+    urlRoot: "/users",
+    idAttribute: "_id",
+    defaults: {
+        _id: null,
+        name: "",
+    }
+});
+
+window.UserCollection = Backbone.Collection.extend({
+    model: User,
+    url: "/users"
+});
+
+// VIEW TEMPLATES
+window.HeaderViewTemplate = '<div class="navbar navbar-inverse navbar-fixed-top" style="z-index: 10;"><div class="navbar-inner"><div class="container"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="#">Cisco APIC Controller</a></div></div></div>';
+window.UserListItemViewTemplate = '<td><%= name %></td>';
+
+// A View for our header
+window.HeaderView = Backbone.View.extend({
+    template: _.template(window.HeaderViewTemplate),
+    initialize: function () {
+        this.render();
+    },
+    render: function () {
+        $(this.el).html(this.template());
+        return this;
+    },
+    selectMenuItem: function (menuItem) {
+        $('.nav li').removeClass('active');
+        if (menuItem) {
+            $('.' + menuItem).addClass('active');
+        }
+    }
+});
+
+// View corresponding to the table body
+window.UserListView = Backbone.View.extend({
+    tagName: 'tbody',
+    initialize: function () {
+        this.render();
+    },
+    render: function () {
+        var users = this.model.models;
+        var len = users.length;
+
+        for(var i= 0; i < len; i++) {
+          $(this.el).append(new UserListItemView({model: users[i]}).render().el);
+        }
+        return this;
+    }
+});
+
+// Single user Item View
+window.UserListItemView = Backbone.View.extend({
+    tagName: "tr",
+    template: _.template(window.UserListItemViewTemplate),
+    initialize: function () {
+        this.model.bind("change", this.render, this);
+        this.model.bind("destroy", this.close, this);
+    },
+    render: function () {
+        $(this.el).html(this.template(this.model.toJSON()));
+        return this;
+    }
+});
+
+// BackBone Router Setups
+var AppRouter = Backbone.Router.extend({
+routes: {
+  ""      : "list",
+  "users" : "list",
+},
+initialize: function () {
+  this.headerView = new HeaderView();
+  $('.header').html(this.headerView.el);
+},
+list: function() {
+  var usersList = new UserCollection();
+  usersList.fetch({success: function(){
+    $("#content").append(new UserListView({model: usersList}).el);
+  }});
+  this.headerView.selectMenuItem('home-menu');
+},
+});
+
+// Start the Backbone
+app = new AppRouter();
+Backbone.history.start();
+</script>
+
+</body>
+</html>
