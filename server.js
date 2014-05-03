@@ -17,6 +17,43 @@ app.get('/users', function(req, res) {
 
 });
 
+
+app.get('/api/v0/user/', function(req, res) {
+    //var data = { version:"0.0", response:[] };
+
+    var data = {
+        version:"0.0",
+        response:[ 
+            {
+                mgmtDeviceIpAddress:"26.6.6.2",
+                mgmtSlotNum: 1,
+                userId:"kyedaval",
+                identityId:"e77db4e5-8201-4a00-8bf8-4fefdface05b",
+                updateTime:"December 4, 2013 1:48:34 PM PST",
+                vlanId: [],
+                macAddress:"00:1B:21:D4:B9:C2",
+                mgmtModuleNum: 0,
+                mgmtPortNum: 7 ,
+                status:"Active"
+            },
+            {
+                mgmtDeviceIpAddress:"26.6.6.3",
+                mgmtSlotNum: 2,
+                userId:"fluffy",
+                identityId:"e77db4e5-8201-4a00-8bf8-4fef4567e05b",
+                updateTime:"December 4, 2013 1:48:34 PM PST",
+                vlanId: [],
+                macAddress:"00:1B:21:D4:FL:FL",
+                mgmtModuleNum: 0,
+                mgmtPortNum: 8 ,
+                status:"Active"
+            }
+        ] };
+
+    res.send( data );
+});
+
+
 http.createServer(app).listen(app.get('port'), function () {
     console.log("Express server listening on port " + app.get('port'));
 });
